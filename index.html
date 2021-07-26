@@ -23,7 +23,8 @@
 
 <p>latitude: <span id="lat"></span><br>
     longitude: <span id="lon"></span><br>
-    velocity: <span id="vel"></span>
+    velocity: <span id="vel"></span><br>
+    visibility: <span id="vis"></span>
 </p>
 <div id="issMap"></div>
 
@@ -59,11 +60,14 @@
             const {
                 latitude,
                 longitude,
-                velocity
+                velocity,
+                visibility
             } = data;
             document.getElementById("lat").textContent = latitude;
             document.getElementById("lon").textContent = longitude;
-            document.getElementById("vel").textContent = velocity;
+            document.getElementById("vel").textContent = velocity + ' mph';
+            document.getElementById("vis").textContent = visibility;
+
             marker.setLatLng([latitude, longitude]);
         }
 
