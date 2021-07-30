@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Fetch JSON from API and map lat lon</title>
+    <title>ISS localization</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
         crossorigin="" />
@@ -24,7 +24,9 @@
 <p>latitude: <span id="lat"></span><br>
     longitude: <span id="lon"></span><br>
     velocity: <span id="vel"></span><br>
-    visibility: <span id="vis"></span>
+    visibility: <span id="vis"></span><br>
+    time: <span id="tim"></span>
+
 </p>
 <div id="issMap"></div>
 
@@ -52,7 +54,9 @@
             icon: issIcon
         }).addTo(mymap);
 
-        const iss_api_url = 'https://api.wheretheiss.at/v1/satellites/25544'
+        const iss_api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+        const iss_api_time_url =
+            'https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps=';
 
         async function getISS() {
             const response = await fetch(iss_api_url);
@@ -61,18 +65,49 @@
                 latitude,
                 longitude,
                 velocity,
-                visibility
+                visibility,
+                timestamp
             } = data;
             document.getElementById("lat").textContent = latitude;
             document.getElementById("lon").textContent = longitude;
-            document.getElementById("vel").textContent = velocity + ' mph';
+            document.getElementById("vel").textContent = velocity + ' km/h';
             document.getElementById("vis").textContent = visibility;
+            document.getElementById("tim").textContent = Date(timestamp);
 
-            marker.setLatLng([latitude, longitude]);
+            marker.setLatLng([latitude, longitude])
         }
 
-        var reloadData = setInterval(getISS, 2000);
+        //estimate localization with timestamp
+        async function getISSPath() {
+            const response = await fetch(iss_api_time_url + tsplus);
+            const dataPath = await response.json();
+            const {
+                latitude,
+                longitude,
+                velocity,
+                visibility,
+                timestamp
+            } = dataPath;
+            for (let i = 0; i < 10; i++) {
+                //console.log(dataPath[i].latitude, dataPath[i].longitude, new Date(dataPath[i].timestamp * 1000));
+                L.circle(L.latLng(dataPath[i].latitude, dataPath[i].longitude), 500)
+                    .bindPopup(String(new Date(dataPath[i].timestamp * 1000)))
+                    .addTo(mymap);
+            };
+        }
+
+        var reloadData = setInterval(getISS, 4000);
         getISS();
+
+        // array of timestamp each minutes
+        let ts = new Date().getTime() / 1000;
+        let tsplus = ts;
+        for (let i = 1; i < 11; i++) {
+            ts = ts + i * 90
+            tsplus = tsplus + ', ' + ts
+        }
+
+        getISSPath();
     </script>
 </body>
 
