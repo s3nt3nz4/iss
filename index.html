@@ -91,7 +91,7 @@
             for (let i = 0; i < 10; i++) {
                 //console.log(dataPath[i].latitude, dataPath[i].longitude, new Date(dataPath[i].timestamp * 1000));
                 L.circle(L.latLng(dataPath[i].latitude, dataPath[i].longitude), 500)
-                    .bindPopup(String(new Date(dataPath[i].timestamp * 1000)))
+                    .bindPopup(String(new Date(dataPath[i].timestamp * 1000) + "<br>" + dataPath[i].visibility))
                     .addTo(mymap);
             };
         }
