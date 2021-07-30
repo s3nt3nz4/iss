@@ -14,7 +14,8 @@
         crossorigin=""></script>
     <style>
         #issMap {
-            height: 360px;
+            width: 600px;
+            height: 400px;
         }
     </style>
 </head>
@@ -90,7 +91,9 @@
             } = dataPath;
             for (let i = 0; i < 10; i++) {
                 //console.log(dataPath[i].latitude, dataPath[i].longitude, new Date(dataPath[i].timestamp * 1000));
-                L.circle(L.latLng(dataPath[i].latitude, dataPath[i].longitude), 500)
+                L.circleMarker(L.latLng(dataPath[i].latitude, dataPath[i].longitude), {
+                        radius: 5
+                    })
                     .bindPopup(String(new Date(dataPath[i].timestamp * 1000) + "<br>" + dataPath[i].visibility))
                     .addTo(mymap);
             };
